@@ -1,0 +1,11 @@
+node_modules/
+my-video/
+output/
+audio/
+assets/*.mp4
+assets/*.webm
+*.mp4
+*.webm
+*.mp3
+.env
+*.log

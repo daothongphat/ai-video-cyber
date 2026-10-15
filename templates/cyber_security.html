@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            margin: 0; padding: 0;
+            width: {{width}}px; height: {{height}}px;
+            background: transparent;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .cyber-grid {
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(0, 255, 100, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 100, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0;
+        }
+        .cyber-container {
+            position: absolute; bottom: 300px; left: 50%;
+            transform: translateX(-50%);
+            width: 90%; padding: 40px;
+            background: rgba(0, 10, 5, 0.85);
+            border: 2px solid rgba(0, 255, 100, 0.6);
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 255, 100, 0.3), inset 0 0 30px rgba(0, 255, 100, 0.05);
+            opacity: 0;
+        }
+        .corner {
+            position: absolute; width: 20px; height: 20px;
+            border-color: #00ff64; border-style: solid;
+            opacity: 0;
+        }
+        .corner-tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; }
+        .corner-tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; }
+        .corner-bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; }
+        .corner-br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; }
+        .cyber-title {
+            font-size: 56px; font-weight: 900; color: #00ff64;
+            text-align: center; text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px rgba(0, 255, 100, 0.8), 0 0 30px rgba(0, 255, 100, 0.4);
+            margin-bottom: 20px; opacity: 0;
+        }
+        .cyber-line {
+            width: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff64, transparent);
+            margin: 0 auto 25px;
+        }
+        .cyber-subtitle {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 28px; color: rgba(0, 255, 100, 0.9);
+            text-align: center; letter-spacing: 2px; opacity: 0;
+        }
+        .scan-line {
+            position: absolute; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff64, transparent);
+            opacity: 0; box-shadow: 0 0 10px #00ff64;
+        }
+        .data-stream {
+            position: absolute;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            color: rgba(0, 255, 100, 0.3);
+            opacity: 0; white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div id="root" data-composition-id="cyber_security" data-start="0" data-duration="15" data-width="{{width}}" data-height="{{height}}" class="clip">
+        <div class="cyber-grid" id="cyberGrid"></div>
+        <div class="cyber-container" id="cyberContainer">
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
+            <div class="cyber-title" id="cyberTitle">{{title}}</div>
+            <div class="cyber-line" id="cyberLine"></div>
+            <div class="cyber-subtitle" id="cyberSubtitle">{{subtitle}}</div>
+        </div>
+        <div class="scan-line" id="scanLine"></div>
+        <div class="data-stream" style="top: 5%; left: 5%;">[ SYSTEM SECURE ]</div>
+        <div class="data-stream" style="top: 5%; right: 5%;">[ ENCRYPTED ]</div>
+        <div class="data-stream" style="bottom: 5%; left: 5%;">[ FIREWALL ACTIVE ]</div>
+        <div class="data-stream" style="bottom: 5%; right: 5%;">[ v2.4.1 ]</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+        const tl = gsap.timeline({ paused: true });
+        tl.to("#cyberGrid", { opacity: 1, duration: 0.8, ease: "power2.out" }, 0);
+        tl.fromTo("#cyberContainer",
+            { opacity: 0, y: 50 },
+            { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.3);
+        tl.to(".corner", { opacity: 1, duration: 0.3, stagger: 0.1, ease: "back.out(2)" }, 0.6);
+        tl.to("#cyberTitle", { opacity: 1, duration: 0.1 }, 0.8);
+        tl.to("#cyberTitle", { opacity: 0, duration: 0.05 }, 0.9);
+        tl.to("#cyberTitle", { opacity: 1, duration: 0.05 }, 0.95);
+        tl.to("#cyberTitle", { opacity: 0, duration: 0.05 }, 1.0);
+        tl.to("#cyberTitle", { opacity: 1, duration: 0.3, ease: "power2.out" }, 1.05);
+        tl.to("#cyberLine", { width: "100%", duration: 0.6, ease: "power2.out" }, 1.0);
+        tl.to("#cyberSubtitle", { opacity: 1, duration: 0.8, ease: "power2.out" }, 1.3);
+        tl.fromTo("#scanLine",
+            { opacity: 0.6, top: "0%" },
+            { opacity: 0.6, top: "100%", duration: 2, ease: "none", repeat: 3 }, 1.5);
+        tl.to(".data-stream", { opacity: 1, duration: 0.5, stagger: 0.15, ease: "power2.out" }, 1.8);
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines["cyber_security"] = tl;
+    </script>
+</body>
+</html>

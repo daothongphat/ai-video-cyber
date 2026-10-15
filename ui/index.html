@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Generator  Cyber Security</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #050a07;
+            color: #00ff64;
+            font-family: 'Orbitron', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0, 255, 100, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 100, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridPulse 4s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+        @keyframes gridPulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        header {
+            padding: 30px 40px;
+            border-bottom: 1px solid rgba(0, 255, 100, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px rgba(0, 255, 100, 0.5);
+        }
+        .logo span { animation: blink 1s step-end infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+        .status-badge {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            padding: 4px 12px;
+            border: 1px solid #00ff64;
+            border-radius: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 5px rgba(0, 255, 100, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(0, 255, 100, 0.8); }
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 60px 40px; }
+        .input-panel {
+            background: rgba(0, 20, 10, 0.8);
+            border: 2px solid rgba(0, 255, 100, 0.3);
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        .input-panel::before, .input-panel::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-color: #00ff64;
+            border-style: solid;
+        }
+        .input-panel::before {
+            top: -2px; left: -2px;
+            border-width: 3px 0 0 3px;
+            animation: cornerGlow 2s ease-in-out infinite;
+        }
+        .input-panel::after {
+            bottom: -2px; right: -2px;
+            border-width: 0 3px 3px 0;
+            animation: cornerGlow 2s ease-in-out infinite 1s;
+        }
+        @keyframes cornerGlow { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        .panel-title {
+            font-size: 14px;
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+            color: rgba(0, 255, 100, 0.7);
+            font-family: 'Share Tech Mono', monospace;
+        }
+        .mode-tabs { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
+        .mode-tab {
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 255, 100, 0.3);
+            border-radius: 6px;
+            color: rgba(0, 255, 100, 0.6);
+            cursor: pointer;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 13px;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            user-select: none;
+        }
+        .mode-tab.active {
+            background: rgba(0, 255, 100, 0.15);
+            border-color: #00ff64;
+            color: #00ff64;
+            box-shadow: 0 0 15px rgba(0, 255, 100, 0.3);
+        }
+        .mode-panel { display: none; }
+        .mode-panel.active { display: block; }
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 255, 100, 0.4);
+            border-radius: 8px;
+            padding: 20px;
+            color: #00ff64;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 16px;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        textarea:focus {
+            border-color: #00ff64;
+            box-shadow: 0 0 20px rgba(0, 255, 100, 0.2);
+        }
+        textarea::placeholder { color: rgba(0, 255, 100, 0.3); }
+        .json-editor {
+            min-height: 320px;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre;
+            overflow-x: auto;
+        }
+        .json-actions { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-secondary {
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 255, 100, 0.4);
+            border-radius: 6px;
+            color: #00ff64;
+            cursor: pointer;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        .btn-secondary:hover { background: rgba(0, 255, 100, 0.1); border-color: #00ff64; }
+        .json-status {
+            margin-top: 10px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            min-height: 18px;
+        }
+        .json-status.valid { color: #00ff64; }
+        .json-status.invalid { color: #ff4444; }
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 25px;
+        }
+        .control-group { width: 100%; }
+        .control-label {
+            display: block;
+            font-size: 11px;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            color: rgba(0, 255, 100, 0.5);
+            font-family: 'Share Tech Mono', monospace;
+        }
+        select, input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 255, 100, 0.3);
+            border-radius: 6px;
+            color: #00ff64;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            outline: none;
+        }
+        select:focus, input:focus { border-color: #00ff64; }
+        .gemini-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 255, 100, 0.3);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .gemini-toggle input {
+            width: auto;
+            cursor: pointer;
+            accent-color: #00ff64;
+        }
+        .gemini-toggle span {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 13px;
+            color: #00ff64;
+        }
+        .btn-generate {
+            width: 100%;
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(0, 255, 100, 0.1), rgba(0, 255, 100, 0.05));
+            border: 2px solid #00ff64;
+            border-radius: 8px;
+            color: #00ff64;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-generate:hover {
+            background: rgba(0, 255, 100, 0.2);
+            box-shadow: 0 0 40px rgba(0, 255, 100, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+        .status-log {
+            background: rgba(0, 10, 5, 0.9);
+            border: 1px solid rgba(0, 255, 100, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .log-line { padding: 4px 0; opacity: 0; animation: logFadeIn 0.3s forwards; }
+        @keyframes logFadeIn { to { opacity: 1; } }
+        .log-time { color: rgba(0, 255, 100, 0.4); }
+        .log-ok { color: #00ff64; }
+        .log-info { color: #00ccff; }
+        .log-warn { color: #ffcc00; }
+        .log-error { color: #ff4444; }
+        .video-preview {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 10, 5, 0.9);
+            border: 1px solid rgba(0, 255, 100, 0.2);
+            border-radius: 8px;
+            display: none;
+        }
+        .video-preview.visible { display: block; }
+        .video-preview video {
+            width: 100%;
+            max-height: 500px;
+            border-radius: 6px;
+            background: #000;
+        }
+        .video-preview-title {
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: rgba(0, 255, 100, 0.7);
+            margin-bottom: 15px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+        .preview-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .btn-download {
+            flex: 1;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, rgba(0, 255, 100, 0.2), rgba(0, 255, 100, 0.1));
+            border: 2px solid #00ff64;
+            border-radius: 8px;
+            color: #00ff64;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-download:hover {
+            background: rgba(0, 255, 100, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 100, 0.4);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">CYBER<span>_</span>VIDEO</div>
+        <div class="status-badge" id="statusBadge"> SYSTEM ONLINE</div>
+    </header>
+
+    <div class="container">
+        <div class="input-panel">
+            <div class="panel-title">// INPUT_SEQUENCE</div>
+
+            <div class="mode-tabs">
+                <div class="mode-tab active" data-mode="prompt">NHÃ¡ÂºÂ¬P PROMPT</div>
+                <div class="mode-tab" data-mode="json">NHÃ¡ÂºÂ¬P JSON</div>
+                <div class="mode-tab" data-mode="html">NHÃ¡ÂºÂ¬P HTML</div>
+            </div>
+
+            <div class="mode-panel active" id="panelPrompt">
+                <textarea id="promptInput" placeholder="NhÃ¡ÂºÂ­p mÃƒÂ´ tÃ¡ÂºÂ£ video bÃ¡ÂºÂ±ng tiÃ¡ÂºÂ¿ng ViÃ¡Â»â€¡t...&#10;&#10;VÃƒÂ­ dÃ¡Â»Â¥: Video giÃ¡Â»â€ºi thiÃ¡Â»â€¡u hÃ¡Â»â€¡ thÃ¡Â»â€˜ng bÃ¡ÂºÂ£o mÃ¡ÂºÂ­t mÃ¡ÂºÂ¡ng, nhÃ¡ÂºÂ¥n mÃ¡ÂºÂ¡nh mÃƒÂ£ hÃƒÂ³a Ã„â€˜a tÃ¡ÂºÂ§ng vÃƒÂ  giÃƒÂ¡m sÃƒÂ¡t 24/7."></textarea>
+            </div>
+
+            <div class="mode-panel" id="panelJson">
+                <textarea class="json-editor" id="jsonInput" spellcheck="false">{
+  "scene_id": "cyber_custom",
+  "template_name": "cyber_security",
+  "template_version": "1.0",
+  "duration": 15.0,
+  "data": {
+    "title": "TIÃƒÅ U Ã„ÂÃ¡Â»â‚¬ VIDEO",
+    "subtitle": "MÃƒÂ´ tÃ¡ÂºÂ£ phÃ¡Â»Â¥ Ã„â€˜Ã¡Â»Â Ã¡Â»Å¸ Ã„â€˜ÃƒÂ¢y // DÃƒÂ²ng 2 // DÃƒÂ²ng 3"
+  }
+}</textarea>
+                <div class="json-actions">
+                    <button class="btn-secondary" id="btnFormatJson">Format JSON</button>
+                    <button class="btn-secondary" id="btnLoadTemplate">Load mÃ¡ÂºÂ«u</button>
+                </div>
+                <div class="json-status" id="jsonStatus"></div>
+            </div>
+
+            <div class="mode-panel" id="panelHtml">
+                <textarea class="json-editor" id="htmlInput" spellcheck="false"><!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        html, body {
+            margin: 0; padding: 0;
+            width: {{width}}px; height: {{height}}px;
+            background: transparent;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+        .hello {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 80px;
+            color: #00ff64;
+            font-weight: 900;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"
+         data-composition-id="custom"
+         data-start="0"
+         data-duration="{{duration}}"
+         data-width="{{width}}"
+         data-height="{{height}}"
+         class="clip">
+        <div class="hello" id="hello">XIN CHÃƒâ‚¬O</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+        const tl = gsap.timeline({ paused: true });
+        tl.to("#hello", { opacity: 1, duration: 1 });
+        window.__timelines = window.__timelines || {};
+        window.__timelines["custom"] = tl;
+    </script>
+</body>
+</html></textarea>
+                <div class="json-actions">
+                    <button class="btn-secondary" id="btnValidateHtml">KiÃ¡Â»Æ’m tra HTML</button>
+                </div>
+                <div class="json-status" id="htmlStatus"></div>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label class="control-label">VOICE</label>
+                    <select id="voiceSelect">
+                        <option value="vi-VN-NamMinhNeural">Nam Minh (Nam)</option>
+                        <option value="vi-VN-HoaiMyNeural">HoÃƒÂ i My (NÃ¡Â»Â¯)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">DURATION (s)</label>
+                    <input type="number" id="durationInput" value="15" min="5" max="120">
+                </div>
+                <div class="control-group">
+                    <label class="control-label">TÃ¡Â»Ë† LÃ¡Â»â€  KHUNG HÃƒÅ’NH</label>
+                    <select id="aspectRatio">
+                        <option value="9:16">9:16  DÃ¡Â»Âc (TikTok/Reels)</option>
+                        <option value="16:9">16:9  Ngang (YouTube)</option>
+                        <option value="1:1">1:1  VuÃƒÂ´ng (Instagram)</option>
+                        <option value="4:5">4:5  DÃ¡Â»Âc feed (Instagram)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Ã„ÂÃ¡Â»Ëœ PHÃƒâ€šN GIÃ¡ÂºÂ¢I</label>
+                    <select id="resolution">
+                        <option value="720p">720p  Nhanh</option>
+                        <option value="1080p" selected>1080p  ChuÃ¡ÂºÂ©n</option>
+                        <option value="1440p">1440p  Cao</option>
+                        <option value="2160p">4K  RÃ¡ÂºÂ¥t cao</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">FPS</label>
+                    <select id="fps">
+                        <option value="24">24  Ã„ÂiÃ¡Â»â€¡n Ã¡ÂºÂ£nh</option>
+                        <option value="30" selected>30  ChuÃ¡ÂºÂ©n</option>
+                        <option value="60">60  MÃ†Â°Ã¡Â»Â£t</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">TEMPLATE</label>
+                    <select id="templateSelect">
+                        <option value="cyber_security">Cyber Security (2D)</option>
+                        <option value="cyber_3d">Cyber Security (3D)</option>
+                        <option value="kinetic">Kinetic Text</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">NGUÃ¡Â»â€™N NÃ¡Â»â‚¬N</label>
+                    <select id="backgroundSource">
+                        <option value="black">NÃ¡Â»Ân Ã„â€˜en (mÃ¡ÂºÂ·c Ã„â€˜Ã¡Â»â€¹nh)</option>
+                        <option value="coverr">Coverr  tÃ¡Â»Â± Ã„â€˜Ã¡Â»â„¢ng tÃ¡ÂºÂ£i</option>
+                        <option value="videvo">Videvo  tÃ¡Â»Â± Ã„â€˜Ã¡Â»â„¢ng tÃ¡ÂºÂ£i</option>
+                        <option value="pexels">Pexels  tÃ¡Â»Â± Ã„â€˜Ã¡Â»â„¢ng tÃ¡ÂºÂ£i</option>
+                        <option value="url">TÃ¡ÂºÂ£i tÃ¡Â»Â« link</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">GEMINI AI</label>
+                    <label class="gemini-toggle">
+                        <input type="checkbox" id="useGemini">
+                        <span>TÃ¡Â»Â± Ã„â€˜Ã¡Â»â„¢ng sinh HTML/GSAP</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="control-group" id="urlInputGroup" style="display:none; margin-top: 20px;">
+                <label class="control-label">URL VIDEO</label>
+                <input type="text" id="backgroundUrl" placeholder="DÃƒÂ¡n link video (YouTube, Pexels, v.v.)...">
+            </div>
+
+            <button class="btn-generate" id="btnGenerate">
+                GENERATE VIDEO
+            </button>
+        </div>
+
+        <div class="video-preview" id="videoPreview">
+            <div class="video-preview-title">// OUTPUT_PREVIEW</div>
+            <video id="previewVideo" controls></video>
+            <div class="preview-actions">
+                <a class="btn-download" id="btnDownload" download>TÃ¡ÂºÂ¢I VIDEO VÃ¡Â»â‚¬</a>
+                <button class="btn-secondary" id="btnNewJob">TÃ¡ÂºÂ O VIDEO MÃ¡Â»Å¡I</button>
+            </div>
+        </div>
+
+        <div class="status-log" id="statusLog">
+            <div class="log-line"><span class="log-time">[SYSTEM]</span> <span class="log-info">Ready. Waiting for input...</span></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+        const btn = document.getElementById('btnGenerate');
+        const log = document.getElementById('statusLog');
+        const prompt = document.getElementById('promptInput');
+        const voiceSelect = document.getElementById('voiceSelect');
+        const durationInput = document.getElementById('durationInput');
+        const templateSelect = document.getElementById('templateSelect');
+        const statusBadge = document.getElementById('statusBadge');
+        const videoPreview = document.getElementById('videoPreview');
+        const previewVideo = document.getElementById('previewVideo');
+        const backgroundSource = document.getElementById('backgroundSource');
+        const urlInputGroup = document.getElementById('urlInputGroup');
+        const backgroundUrl = document.getElementById('backgroundUrl');
+        const aspectRatio = document.getElementById('aspectRatio');
+        const resolution = document.getElementById('resolution');
+        const fps = document.getElementById('fps');
+        const useGemini = document.getElementById('useGemini');
+
+        let currentJobId = null;
+        let pollInterval = null;
+        let currentMode = 'prompt';
+        let lastLogMessage = '';
+
+        const tabs = document.querySelectorAll('.mode-tab');
+        const panelPrompt = document.getElementById('panelPrompt');
+        const panelJson = document.getElementById('panelJson');
+        const panelHtml = document.getElementById('panelHtml');
+        const jsonInput = document.getElementById('jsonInput');
+        const jsonStatus = document.getElementById('jsonStatus');
+        const htmlInput = document.getElementById('htmlInput');
+        const htmlStatus = document.getElementById('htmlStatus');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentMode = tab.dataset.mode;
+                panelPrompt.classList.toggle('active', currentMode === 'prompt');
+                panelJson.classList.toggle('active', currentMode === 'json');
+                panelHtml.classList.toggle('active', currentMode === 'html');
+            });
+        });
+
+        const portraitInputGroup = document.getElementById('portraitInputGroup');
+        const portraitPath = document.getElementById('portraitPath');
+
+        backgroundSource.addEventListener('change', () => {
+            urlInputGroup.style.display = backgroundSource.value === 'url' ? 'block' : 'none';
+            portraitInputGroup.style.display = backgroundSource.value === 'omnihuman' ? 'block' : 'none';
+        });
+
+        function validateJson() {
+            const text = jsonInput.value.trim();
+            if (!text) { jsonStatus.textContent = ''; jsonStatus.className = 'json-status'; return null; }
+            try {
+                const parsed = JSON.parse(text);
+                jsonStatus.textContent = 'JSON hÃ¡Â»Â£p lÃ¡Â»â€¡';
+                jsonStatus.className = 'json-status valid';
+                return parsed;
+            } catch (err) {
+                jsonStatus.textContent = err.message;
+                jsonStatus.className = 'json-status invalid';
+                return null;
+            }
+        }
+
+        jsonInput.addEventListener('input', validateJson);
+
+        function validateHtml() {
+            const text = htmlInput.value.trim();
+            if (!text) { htmlStatus.textContent = ''; htmlStatus.className = 'json-status'; return null; }
+            const hasDoctype = text.includes('<!DOCTYPE') || text.includes('<html');
+            const hasRoot = text.includes('data-composition-id');
+            const hasTimeline = text.includes('window.__timelines');
+            if (!hasDoctype) { htmlStatus.textContent = 'ThiÃ¡ÂºÂ¿u DOCTYPE'; htmlStatus.className = 'json-status invalid'; return null; }
+            if (!hasRoot) { htmlStatus.textContent = 'ThiÃ¡ÂºÂ¿u data-composition-id'; htmlStatus.className = 'json-status invalid'; return null; }
+            if (!hasTimeline) { htmlStatus.textContent = 'ThiÃ¡ÂºÂ¿u window.__timelines'; htmlStatus.className = 'json-status invalid'; return null; }
+            htmlStatus.textContent = 'HTML hÃ¡Â»Â£p lÃ¡Â»â€¡';
+            htmlStatus.className = 'json-status valid';
+            return text;
+        }
+
+        htmlInput.addEventListener('input', validateHtml);
+        document.getElementById('btnValidateHtml').addEventListener('click', validateHtml);
+        document.getElementById('btnFormatJson').addEventListener('click', () => {
+            const parsed = validateJson();
+            if (parsed) { jsonInput.value = JSON.stringify(parsed, null, 2); validateJson(); }
+        });
+
+        document.getElementById('btnLoadTemplate').addEventListener('click', () => {
+            const template = {
+                scene_id: "cyber_custom",
+                template_name: "cyber_security",
+                template_version: "1.0",
+                duration: 15.0,
+                data: { title: "HÃ¡Â»â€  THÃ¡Â»ÂNG BÃ¡ÂºÂ¢O MÃ¡ÂºÂ¬T", subtitle: "MÃƒÆ’ HÃƒâ€œA Ã„ÂA TÃ¡ÂºÂ¦NG // GIÃƒÂM SÃƒÂT 24/7" }
+            };
+            jsonInput.value = JSON.stringify(template, null, 2);
+            validateJson();
+        });
+
+        function addLog(message, type = 'info') {
+            if (message === lastLogMessage) return;
+            lastLogMessage = message;
+            const time = new Date().toLocaleTimeString('vi-VN');
+            const line = document.createElement('div');
+            line.className = 'log-line';
+            line.innerHTML = `<span class="log-time">[${time}]</span> <span class="log-${type}">${message}</span>`;
+            log.appendChild(line);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        document.getElementById('btnNewJob').addEventListener('click', () => {
+            videoPreview.classList.remove('visible');
+            previewVideo.src = '';
+            log.innerHTML = '<div class="log-line"><span class="log-time">[SYSTEM]</span> <span class="log-info">Ready. Waiting for input...</span></div>';
+            lastLogMessage = '';
+        });
+
+        btn.addEventListener('click', async () => {
+            let payload = {
+                voice: voiceSelect.value,
+                duration: parseInt(durationInput.value),
+                template: templateSelect.value,
+                backgroundSource: backgroundSource.value,
+                backgroundUrl: backgroundUrl.value,
+                portraitPath: portraitPath.value,
+                aspectRatio: aspectRatio.value,
+                resolution: resolution.value,
+                fps: parseInt(fps.value),
+                useGemini: useGemini.checked
+            };
+
+            if (currentMode === 'json') {
+                const parsed = validateJson();
+                if (!parsed) { addLog('JSON khÃƒÂ´ng hÃ¡Â»Â£p lÃ¡Â»â€¡', 'warn'); return; }
+                payload.sceneJson = parsed;
+                addLog('Mode: JSON thÃ¡Â»Â§ cÃƒÂ´ng', 'info');
+            } else if (currentMode === 'html') {
+                const html = validateHtml();
+                if (!html) { addLog('HTML khÃƒÂ´ng hÃ¡Â»Â£p lÃ¡Â»â€¡', 'warn'); return; }
+                payload.customHtml = html;
+                addLog('Mode: HTML thÃ¡Â»Â§ cÃƒÂ´ng', 'info');
+            } else {
+                const text = prompt.value.trim();
+                if (!text) { addLog('Prompt trÃ¡Â»â€˜ng', 'warn'); return; }
+                payload.prompt = text;
+                addLog(useGemini.checked ? 'Mode: Gemini sinh HTML' : 'Mode: Prompt tÃ¡Â»Â± Ã„â€˜Ã¡Â»â„¢ng', 'info');
+            }
+
+            addLog('Initializing...', 'info');
+            btn.disabled = true;
+            btn.textContent = 'PROCESSING...';
+            statusBadge.textContent = ' PROCESSING';
+            statusBadge.style.color = '#ffcc00';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error(`Server error: ${response.status}`);
+                const data = await response.json();
+                currentJobId = data.jobId;
+                addLog(`Job created: ${currentJobId}`, 'ok');
+                pollInterval = setInterval(() => pollStatus(currentJobId), 2000);
+            } catch (err) {
+                addLog(`ERROR: ${err.message}`, 'error');
+                btn.disabled = false;
+                btn.textContent = 'GENERATE VIDEO';
+                statusBadge.textContent = ' SYSTEM ONLINE';
+                statusBadge.style.color = '#00ff64';
+            }
+        });
+
+        async function pollStatus(jobId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/status/${jobId}`);
+                const data = await response.json();
+                if (data.lastLog) addLog(data.lastLog, data.lastLogType || 'info');
+
+                if (data.status === 'completed') {
+                    clearInterval(pollInterval);
+                    addLog(`Video ready: ${data.outputFile}`, 'ok');
+                    btn.disabled = false;
+                    btn.textContent = 'GENERATE VIDEO';
+                    statusBadge.textContent = ' SYSTEM ONLINE';
+                    statusBadge.style.color = '#00ff64';
+                    videoPreview.classList.add('visible');
+                    const videoUrl = `${API_BASE}/api/download/${jobId}?t=${Date.now()}`;
+                    previewVideo.src = videoUrl;
+                    const btnDownload = document.getElementById('btnDownload');
+                    btnDownload.href = videoUrl;
+                    btnDownload.setAttribute('download', data.outputFile || 'video.mp4');
+                } else if (data.status === 'failed') {
+                    clearInterval(pollInterval);
+                    addLog(`ERROR: ${data.error}`, 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'GENERATE VIDEO';
+                    statusBadge.textContent = ' SYSTEM ONLINE';
+                    statusBadge.style.color = '#00ff64';
+                }
+            } catch (err) {
+                addLog(`Poll error: ${err.message}`, 'warn');
+            }
+        }
+    </script>
+</body>
+</html>

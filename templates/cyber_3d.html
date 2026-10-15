@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            margin: 0; padding: 0;
+            width: {{width}}px; height: {{height}}px;
+            background: transparent;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+            perspective: 2000px;
+        }
+        .scene {
+            position: absolute;
+            inset: 0;
+            transform-style: preserve-3d;
+        }
+        
+        /* Deep background layer - grid */
+        .grid-layer {
+            position: absolute;
+            inset: -20%;
+            background-image:
+                linear-gradient(rgba(0, 255, 100, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 100, 0.08) 1px, transparent 1px);
+            background-size: 60px 60px;
+            transform: translateZ(-800px);
+            opacity: 0;
+        }
+        
+        /* Mid layer - rotating rings */
+        .ring {
+            position: absolute;
+            top: 50%; left: 50%;
+            border: 2px solid rgba(0, 255, 100, 0.4);
+            border-radius: 50%;
+            transform-style: preserve-3d;
+            opacity: 0;
+            box-shadow: 0 0 30px rgba(0, 255, 100, 0.3), inset 0 0 30px rgba(0, 255, 100, 0.1);
+        }
+        .ring-1 { width: 600px; height: 600px; margin: -300px 0 0 -300px; }
+        .ring-2 { width: 900px; height: 900px; margin: -450px 0 0 -450px; border-style: dashed; }
+        .ring-3 { width: 1200px; height: 1200px; margin: -600px 0 0 -600px; border-color: rgba(0, 255, 100, 0.15); }
+        
+        /* Center card - 3D rotating */
+        .card-3d {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) translateZ(0) rotateY(0deg);
+            transform-style: preserve-3d;
+            width: 85%;
+            max-width: 900px;
+            padding: 60px 50px;
+            background: rgba(0, 15, 8, 0.88);
+            border: 2px solid rgba(0, 255, 100, 0.7);
+            border-radius: 12px;
+            box-shadow:
+                0 0 60px rgba(0, 255, 100, 0.4),
+                inset 0 0 60px rgba(0, 255, 100, 0.08);
+            opacity: 0;
+        }
+        
+        /* Corner brackets */
+        .corner {
+            position: absolute;
+            width: 30px; height: 30px;
+            border-color: #00ff64; border-style: solid;
+            opacity: 0;
+        }
+        .tl { top: -3px; left: -3px; border-width: 4px 0 0 4px; }
+        .tr { top: -3px; right: -3px; border-width: 4px 4px 0 0; }
+        .bl { bottom: -3px; left: -3px; border-width: 0 0 4px 4px; }
+        .br { bottom: -3px; right: -3px; border-width: 0 4px 4px 0; }
+        
+        /* Content */
+        .title-3d {
+            font-size: 72px;
+            font-weight: 900;
+            color: #00ff64;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            text-align: center;
+            text-shadow:
+                0 0 20px rgba(0, 255, 100, 0.9),
+                0 0 60px rgba(0, 255, 100, 0.5),
+                0 4px 0 rgba(0, 100, 40, 0.8);
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateZ(80px);
+        }
+        
+        .divider-3d {
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #00ff64, transparent);
+            margin: 0 auto 30px;
+            box-shadow: 0 0 20px #00ff64;
+        }
+        
+        .subtitle-3d {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 32px;
+            color: rgba(0, 255, 100, 0.95);
+            text-align: center;
+            letter-spacing: 3px;
+            opacity: 0;
+            transform: translateZ(40px);
+        }
+        
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            width: 4px; height: 4px;
+            background: #00ff64;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ff64;
+            opacity: 0;
+        }
+        
+        /* Data streams */
+        .stream {
+            position: absolute;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 16px;
+            color: rgba(0, 255, 100, 0.5);
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateZ(-200px);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"
+         data-composition-id="cyber_3d"
+         data-start="0"
+         data-duration="{{duration}}"
+         data-width="{{width}}"
+         data-height="{{height}}"
+         class="clip">
+        <div class="scene" id="scene">
+            <!-- Deep grid layer -->
+            <div class="grid-layer" id="gridLayer"></div>
+            
+            <!-- Rotating rings in 3D space -->
+            <div class="ring ring-1" id="ring1"></div>
+            <div class="ring ring-2" id="ring2"></div>
+            <div class="ring ring-3" id="ring3"></div>
+            
+            <!-- Data streams floating in depth -->
+            <div class="stream" style="top: 15%; left: 5%;">[ FIREWALL ACTIVE ]</div>
+            <div class="stream" style="top: 15%; right: 5%;">[ AES-256 ]</div>
+            <div class="stream" style="bottom: 15%; left: 5%;">[ ZERO TRUST ]</div>
+            <div class="stream" style="bottom: 15%; right: 5%;">[ v3.0.1 ]</div>
+            
+            <!-- Particles -->
+            <div class="particle" style="top: 20%; left: 30%;"></div>
+            <div class="particle" style="top: 40%; left: 70%;"></div>
+            <div class="particle" style="top: 60%; left: 20%;"></div>
+            <div class="particle" style="top: 75%; left: 80%;"></div>
+            <div class="particle" style="top: 30%; left: 85%;"></div>
+            <div class="particle" style="top: 80%; left: 40%;"></div>
+            
+            <!-- Main 3D card -->
+            <div class="card-3d" id="card3d">
+                <div class="corner tl"></div>
+                <div class="corner tr"></div>
+                <div class="corner bl"></div>
+                <div class="corner br"></div>
+                
+                <div class="title-3d" id="title3d">{{title}}</div>
+                <div class="divider-3d" id="divider3d"></div>
+                <div class="subtitle-3d" id="subtitle3d">{{subtitle}}</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+        const tl = gsap.timeline({ paused: true });
+        
+        // 1. Grid layer xuất hiện từ sâu
+        tl.fromTo("#gridLayer",
+            { opacity: 0, scale: 0.5 },
+            { opacity: 1, scale: 1, duration: 1.2, ease: "power3.out" },
+            0
+        );
+        
+        // 2. Rings xuất hiện và xoay
+        tl.to(".ring", { opacity: 1, duration: 0.8, stagger: 0.15 }, 0.3);
+        tl.fromTo("#ring1", { rotateZ: 0 }, { rotateZ: 360, duration: 10, ease: "none" }, 0.3);
+        tl.fromTo("#ring2", { rotateZ: 0, rotateX: 60 }, { rotateZ: -360, rotateX: 60, duration: 14, ease: "none" }, 0.3);
+        tl.fromTo("#ring3", { rotateZ: 0, rotateY: 70 }, { rotateZ: 360, rotateY: 70, duration: 18, ease: "none" }, 0.3);
+        
+        // 3. Card bay vào từ không gian 3D
+        tl.fromTo("#card3d",
+            { opacity: 0, rotateY: -45, z: -500, scale: 0.7 },
+            { opacity: 1, rotateY: 0, z: 0, scale: 1, duration: 1.2, ease: "power4.out" },
+            0.5
+        );
+        
+        // 4. Card xoay nhẹ liên tục
+        tl.to("#card3d", {
+            rotateY: 5, rotateX: -3,
+            duration: 3, ease: "sine.inOut", yoyo: true, repeat: 3
+        }, 1.8);
+        
+        // 5. Corner brackets xuất hiện
+        tl.to(".corner", { opacity: 1, duration: 0.4, stagger: 0.08, ease: "back.out(2)" }, 1.2);
+        
+        // 6. Title bay lên trong không gian 3D
+        tl.fromTo("#title3d",
+            { opacity: 0, z: 0, y: 30 },
+            { opacity: 1, z: 80, y: 0, duration: 0.8, ease: "power3.out" },
+            1.4
+        );
+        
+        // 7. Divider mở rộng
+        tl.to("#divider3d", { width: "70%", duration: 0.7, ease: "power2.out" }, 1.8);
+        
+        // 8. Subtitle xuất hiện
+        tl.fromTo("#subtitle3d",
+            { opacity: 0, z: 0 },
+            { opacity: 1, z: 40, duration: 0.7, ease: "power2.out" },
+            2.1
+        );
+        
+        // 9. Particles bay lên
+        tl.to(".particle", {
+            opacity: 0.8, duration: 0.5, stagger: 0.1
+        }, 2.3);
+        tl.to(".particle", {
+            y: -80, duration: 4, ease: "none", stagger: 0.3
+        }, 2.5);
+        
+        // 10. Data streams xuất hiện
+        tl.to(".stream", { opacity: 1, duration: 0.6, stagger: 0.15 }, 2.5);
+        
+        // 11. Glow pulse cuối
+        tl.to("#card3d", {
+            boxShadow: "0 0 100px rgba(0, 255, 100, 0.8), inset 0 0 80px rgba(0, 255, 100, 0.15)",
+            duration: 1.5, ease: "sine.inOut", yoyo: true, repeat: 2
+        }, 3);
+        
+        window.__timelines = window.__timelines || {};
+        window.__timelines["cyber_3d"] = tl;
+    </script>
+</body>
+</html>

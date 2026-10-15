@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "free-resource": {
+      "source": "skills-router/skills-store",
+      "sourceType": "github",
+      "skillPath": "skills/free-resource/SKILL.md",
+      "computedHash": "33631f6a9b60d5a9b6489e67cabeab32e9f146bda35f2c3f63b1a0feb4b28532"
+    }
+  }
+}
